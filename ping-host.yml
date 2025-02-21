@@ -1,16 +1,7 @@
 ---
-
-- hosts: all
-  gather_facts: False
-  connection: local
-
+- name: ping all hosts
+  gather_facts: false
+  hosts: all
   tasks:
-
-    - name: ping
-      shell: ping -c 1 -w 2 8.8.8.8
-      ignore_errors: true
- tasks:
-
-    - name: ping
-      shell: ping -c 1 -w 2 8.8.8.8
-      ignore_errors: true
+    - name: ping a host
+      ping:

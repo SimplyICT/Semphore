@@ -16,6 +16,10 @@
       upgrade: dist
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
+- hosts: all
+  become: true
+  roles:
+    - vps
 
 - hosts: all
   become: true

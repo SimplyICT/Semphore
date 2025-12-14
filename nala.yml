@@ -1,6 +1,6 @@
 ---
 - name: Install Nala package manager
-  hosts: all
+  hosts: test
   become: true
   gather_facts: true
 

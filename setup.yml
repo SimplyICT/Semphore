@@ -11,6 +11,12 @@
         state: latest
         update_cache: true
 
+    - name: Install Nala
+      apt:
+        name: Nala
+        state: latest
+        update_cache: true
+
     - name: Setup passwordless sudo
       lineinfile:
         path: /etc/sudoers

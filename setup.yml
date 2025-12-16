@@ -21,13 +21,7 @@
       apt:
         name: zsh
         state: latest
-        update_cache: true 
-
-    - name: Install zerotier
-      apt:
-        name: zerotier
-        state: latest
-        update_cache: true            
+        update_cache: true      
 
     - name: Install cockpit
       apt:

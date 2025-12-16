@@ -17,6 +17,24 @@
         state: latest
         update_cache: true
 
+    - name: Install zsh
+      apt:
+        name: zsh
+        state: latest
+        update_cache: true 
+
+    - name: Install zerotier
+      apt:
+        name: zerotier
+        state: latest
+        update_cache: true            
+
+    - name: Install cockpit
+      apt:
+        name: cockpit
+        state: latest
+        update_cache: true
+        
     - name: Setup passwordless sudo
       lineinfile:
         path: /etc/sudoers
@@ -32,12 +50,6 @@
         groups: sudo
         append: true
         create_home: true
-
-    - name: Set authorized key for remote user
-      ansible.posix.authorized_key:
-        user: "{{ created_username }}"
-        state: present
-        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
     - name: Disable password authentication for root
       lineinfile:

@@ -23,11 +23,11 @@
         state: latest
         update_cache: true      
 
-    -name: Install Zerotier
-     uri:
-       url: 'https://install.zerotier.com'
-       method: GET
-      register: result
+    - name: Install Zerotier
+      uri:
+        url: 'https://install.zerotier.com'
+        method: GET
+       register: result
 
     - name: Install cockpit
       apt:

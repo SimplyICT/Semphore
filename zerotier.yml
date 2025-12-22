@@ -28,11 +28,6 @@
       register: zerotier_status
       changed_when: false
 
-    - name: zerotier
-      vars:
-        zerotier_network: "50eee35c5523044f"
-        zerotier_network_state: present      
-
-    - name: Show ZeroTier status
+   - name: Show ZeroTier status
       debug:
         msg: "{{ zerotier_status.stdout }}"

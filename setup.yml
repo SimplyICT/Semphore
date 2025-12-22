@@ -23,7 +23,7 @@
         state: latest
         update_cache: true      
 
-    -name: 'https://install.zerotier.com'
+    -name: Install Zerotier
      uri:
        url: 'https://install.zerotier.com'
        method: GET

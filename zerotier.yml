@@ -28,7 +28,7 @@
       register: zerotier_status
       changed_when: false
 
-    - name: cchurch.zerotier
+    - name: zerotier
       vars:
         zerotier_network: "50eee35c5523044f"
         zerotier_network_state: present      

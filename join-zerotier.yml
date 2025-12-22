@@ -1,4 +1,4 @@
-    - name:  znetwork
+    - name:  network
         ansible.builtin.command:
           cmd: /usr/local/bin/zerotier-cli join 50eee35c5523044f
         become: true

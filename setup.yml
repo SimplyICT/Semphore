@@ -23,11 +23,24 @@
         state: latest
         update_cache: true      
 
-    - name: Install Zerotier
-      uri:
-        url: 'https://install.zerotier.com'
-        method: GET
-        register: result
+   - name: Install ZeroTier
+      hosts: all
+      become: yes
+
+      tasks:
+      - name: Install ZeroTier on Debian/Ubuntu
+        when: ansible_os_family == "Debian"
+        block:
+        - name: Download ZeroTier install script
+          get_url:
+            url: https://install.zerotier.com
+            dest: /tmp/zerotier-install.sh
+            mode: '0755'
+
+        - name: Run ZeroTier install script
+          command: /tmp/zerotier-install.sh
+          args:
+            creates: /usr/sbin/zerotier-one
 
     - name: Install cockpit
       apt:

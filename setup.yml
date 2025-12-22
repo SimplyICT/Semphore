@@ -22,13 +22,14 @@
         name: zsh
         state: latest
         update_cache: true      
+    
     - name: Install cockpit
       apt:
         name: cockpit
         state: latest
         update_cache: true
 
-     - name: Install Docker
+    - name: Install Docker
       apt:
         name: docker
         state: latest

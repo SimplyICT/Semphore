@@ -28,7 +28,7 @@
       become: yes
 
       tasks:
-      - name: Install ZeroTier on Debian/Ubuntu
+      - name: Install ZeroTier
         when: ansible_os_family == "Debian"
         block:
         - name: Download ZeroTier install script

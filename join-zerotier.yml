@@ -1,8 +1,9 @@
-- name: Install and join ZeroTier network
-  hosts: all
+- name: Join the ZeroTier network
+  ansible.builtin.command:
+    cmd: /usr/local/bin/zerotier-cli join 50eee35c5523044f
   become: true
-  roles:
-    - name: cchurch.zerotier
-      vars:
-        zerotier_network: "50eee35c5523044f"
-        zerotier_network_state: present
+  register: zerotier_join_output
+  changed_when: zerotier_join_output.rc == 0 and "join OK" in zerotier_join_output.stdout
+  # Optional: Print the output
+  # debug:
+  #   var: zerotier_join_output.stdout

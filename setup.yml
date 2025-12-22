@@ -28,6 +28,18 @@
         name: cockpit
         state: latest
         update_cache: true
+
+    - name: Install Docker
+      apt:
+        name: docker
+        state: latest
+        update_cache: true        
+
+    - name: Install docker-compose
+      apt:
+        name: docker-compose
+        state: latest
+        update_cache: true  
         
     - name: Setup passwordless sudo
       lineinfile:

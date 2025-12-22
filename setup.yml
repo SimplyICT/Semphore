@@ -23,15 +23,7 @@
         state: latest
         update_cache: true      
 
-   - name: Ensure required packages are installed
-      apt:
-        name:
-          - curl
-          - gnupg
-        state: present
-        update_cache: yes
-
-    - name: Install ZeroTier using official install script
+  - name: Install ZeroTier using official install script
       shell: |
         curl -s https://install.zerotier.com | bash
       args:

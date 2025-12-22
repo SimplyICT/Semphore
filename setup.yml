@@ -27,7 +27,7 @@
       uri:
         url: 'https://install.zerotier.com'
         method: GET
-       register: result
+        register: result
 
     - name: Install cockpit
       apt:

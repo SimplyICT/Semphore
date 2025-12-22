@@ -24,8 +24,7 @@
         update_cache: true      
 
     - name: Install ZeroTier
-        - name: Download ZeroTier install script
-          get_url:
+         get_url:
             url: https://install.zerotier.com
             dest: /tmp/zerotier-install.sh
             mode: '0755'

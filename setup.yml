@@ -24,7 +24,6 @@
         update_cache: true      
 
     - name: Install ZeroTier
-        when: ansible_os_family == "Debian"
         block:
         - name: Download ZeroTier install script
           get_url:

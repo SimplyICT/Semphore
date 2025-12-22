@@ -23,12 +23,7 @@
         state: latest
         update_cache: true      
 
-   - name: Install ZeroTier
-      hosts: all
-      become: yes
-
-      tasks:
-      - name: Install ZeroTier
+    - name: Install ZeroTier
         when: ansible_os_family == "Debian"
         block:
         - name: Download ZeroTier install script
@@ -37,7 +32,7 @@
             dest: /tmp/zerotier-install.sh
             mode: '0755'
 
-        - name: Run ZeroTier install script
+    - name: Run ZeroTier install script
           command: /tmp/zerotier-install.sh
           args:
             creates: /usr/sbin/zerotier-one

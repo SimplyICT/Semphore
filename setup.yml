@@ -24,7 +24,6 @@
         update_cache: true      
 
     - name: Install ZeroTier
-        block:
         - name: Download ZeroTier install script
           get_url:
             url: https://install.zerotier.com

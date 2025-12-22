@@ -22,28 +22,6 @@
         name: zsh
         state: latest
         update_cache: true      
-
-  - name: Install ZeroTier using official install script
-      shell: |
-        curl -s https://install.zerotier.com | bash
-      args:
-        creates: /usr/sbin/zerotier-cli
-
-    - name: Enable and start ZeroTier service
-      systemd:
-        name: zerotier-one
-        enabled: yes
-        state: started
-
-    - name: Verify ZeroTier installation
-      command: zerotier-cli status
-      register: zerotier_status
-      changed_when: false
-
-    - name: Show ZeroTier status
-      debug:
-        msg: "{{ zerotier_status.stdout }}"
-
     - name: Install cockpit
       apt:
         name: cockpit

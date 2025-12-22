@@ -1,8 +1,0 @@
-- name: Install and join ZeroTier network
-  hosts: all
-  become: true
-  roles:
-    - name: cchurch.zerotier
-      vars:
-        zerotier_network: "50eee35c5523044f"
-        zerotier_network_state: present

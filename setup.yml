@@ -28,6 +28,12 @@
         state: latest
         update_cache: true
 
+  - name: install fail2ban
+    apt:
+      name: fail2ban
+      state: present
+      update_cache: yes
+
     - name: Install Docker
       apt:
         name: docker

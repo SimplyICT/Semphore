@@ -1,0 +1,48 @@
+---
+- name: Install Oh My Zsh
+  hosts: all
+  become: false
+  vars:
+    user_home: "{{ ansible_env.HOME }}"
+    oh_my_zsh_dir: "{{ user_home }}/.oh-my-zsh"
+
+  tasks:
+    - name: Ensure required packages are installed (Debian/Ubuntu)
+      become: true
+      apt:
+        name:
+          - zsh
+          - curl
+          - git
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure required packages are installed (RedHat)
+      become: true
+      yum:
+        name:
+          - zsh
+          - curl
+          - git
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Check if Oh My Zsh is already installed
+      stat:
+        path: "{{ oh_my_zsh_dir }}"
+      register: ohmyzsh_installed
+
+    - name: Install Oh My Zsh (non-interactive)
+      shell: |
+        RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+      args:
+        creates: "{{ oh_my_zsh_dir }}"
+      when: not ohmyzsh_installed.stat.exists
+
+    - name: Ensure default shell is zsh for current user
+      become: true
+      user:
+        name: "{{ ansible_user_id }}"
+        shell: /usr/bin/zsh

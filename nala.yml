@@ -1,4 +1,3 @@
-----
 - name: Install Nala package manager
   hosts: test
   become: true

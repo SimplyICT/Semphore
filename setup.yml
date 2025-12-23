@@ -4,21 +4,6 @@
   vars:
     created_username: sammy
     
- tasks:
-  - name: Update APT package cache
-    apt: 
-      update_cache: yes
-  
-  - name: Upgrade all packages
-    apt: 
-      upgrade: yes 
-      state: latest 
-    
-  - name:  Clean up APT cache (optional)
-    apt: 
-      autoremove: yes
-      clean: yes     
-
   tasks:
     - name: Install aptitude
       apt:

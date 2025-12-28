@@ -1,20 +1,25 @@
 ---
-- name: Update and upgrade Ubuntu hosts
+- name: Update and upgrade Ubuntu servers
   hosts: all
-  become: true 
+  become: true
   become_method: sudo
-  
+  become_user: root
+
   tasks:
-- name: Update APT package cache
-    apt: 
-      update_cache: yes
-  
-- name: Upgrade all packages
-    apt: 
-      upgrade: yes 
-      state: latest 
-    
-- name:  Clean up APT cache (optional)
-    apt: 
-      autoremove: yes
-      clean: yes 
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+
+    - name: Remove unused packages
+      apt:
+        autoremove: yes
+        purge: yes
+
+    - name: Clean apt cache
+      apt:
+        autoclean: yes

@@ -7,19 +7,19 @@
 
   tasks:
     - name: Update apt cache
-      apt:
+      nala:
         update_cache: yes
         cache_valid_time: 3600
 
     - name: Upgrade all packages
-      apt:
+      nala:
         upgrade: dist
 
     - name: Remove unused packages
-      apt:
+      nala:
         autoremove: yes
         purge: yes
 
     - name: Clean apt cache
-      apt:
+      nala:
         autoclean: yes

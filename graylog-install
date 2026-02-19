@@ -1,0 +1,195 @@
+---
+- name: Production Graylog Deployment
+  hosts: graylog
+  become: yes
+
+  tasks:
+
+  - name: Update system
+    apt:
+      update_cache: yes
+      upgrade: dist
+
+  - name: Install base packages
+    apt:
+      name:
+        - curl
+        - gnupg
+        - apt-transport-https
+        - openjdk-17-jre-headless
+        - nginx
+        - ufw
+        - certbot
+        - python3-certbot-nginx
+      state: present
+
+  ########################################
+  # MongoDB 6
+  ########################################
+
+  - name: Add MongoDB key
+    apt_key:
+      url: https://pgp.mongodb.com/server-6.0.asc
+
+  - name: Add MongoDB repo
+    apt_repository:
+      repo: "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse"
+
+  - name: Install MongoDB
+    apt:
+      name: mongodb-org
+      update_cache: yes
+
+  - name: Bind MongoDB to localhost
+    lineinfile:
+      path: /etc/mongod.conf
+      regexp: '^  bindIp:'
+      line: "  bindIp: 127.0.0.1"
+
+  - name: Start MongoDB
+    systemd:
+      name: mongod
+      enabled: yes
+      state: started
+
+  ########################################
+  # OpenSearch 2.x
+  ########################################
+
+  - name: Add OpenSearch key
+    shell: |
+      curl -o- https://artifacts.opensearch.org/publickeys/opensearch.pgp | gpg --dearmor | tee /usr/share/keyrings/opensearch.gpg > /dev/null
+    args:
+      executable: /bin/bash
+
+  - name: Add OpenSearch repo
+    apt_repository:
+      repo: "deb [signed-by=/usr/share/keyrings/opensearch.gpg] https://artifacts.opensearch.org/releases/bundle/opensearch/2.x/apt stable main"
+
+  - name: Install OpenSearch
+    apt:
+      name: opensearch
+      update_cache: yes
+
+  - name: Configure OpenSearch
+    blockinfile:
+      path: /etc/opensearch/opensearch.yml
+      block: |
+        cluster.name: graylog
+        network.host: 127.0.0.1
+        discovery.type: single-node
+        plugins.security.disabled: true
+
+  - name: Configure OpenSearch heap
+    lineinfile:
+      path: /etc/opensearch/jvm.options
+      regexp: '^-Xms'
+      line: "-Xms{{ opensearch_heap }}"
+
+  - name: Configure OpenSearch heap max
+    lineinfile:
+      path: /etc/opensearch/jvm.options
+      regexp: '^-Xmx'
+      line: "-Xmx{{ opensearch_heap }}"
+
+  - name: Start OpenSearch
+    systemd:
+      name: opensearch
+      enabled: yes
+      state: started
+
+  ########################################
+  # Graylog 5.x
+  ########################################
+
+  - name: Download Graylog repo package
+    get_url:
+      url: https://packages.graylog2.org/repo/packages/graylog-5.2-repository_latest.deb
+      dest: /tmp/graylog-repo.deb
+
+  - name: Install Graylog repo
+    apt:
+      deb: /tmp/graylog-repo.deb
+
+  - name: Install Graylog
+    apt:
+      name: graylog-server
+      update_cache: yes
+
+  - name: Configure Graylog
+    blockinfile:
+      path: /etc/graylog/server/server.conf
+      block: |
+        password_secret = {{ graylog_password_secret }}
+        root_password_sha2 = {{ graylog_root_password_sha2 }}
+        http_bind_address = 127.0.0.1:9000
+        http_external_uri = https://{{ graylog_domain }}/
+        elasticsearch_hosts = http://127.0.0.1:9200
+
+  - name: Configure Graylog heap
+    lineinfile:
+      path: /etc/default/graylog-server
+      regexp: '^GRAYLOG_SERVER_JAVA_OPTS'
+      line: 'GRAYLOG_SERVER_JAVA_OPTS="-Xms{{ graylog_heap }} -Xmx{{ graylog_heap }} -server -XX:+UseG1GC"'
+
+  - name: Start Graylog
+    systemd:
+      name: graylog-server
+      enabled: yes
+      state: started
+
+  ########################################
+  # Nginx Reverse Proxy + TLS
+  ########################################
+
+  - name: Configure Nginx site
+    copy:
+      dest: /etc/nginx/sites-available/graylog
+      content: |
+        server {
+          listen 80;
+          server_name {{ graylog_domain }};
+          location / {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_pass http://127.0.0.1:9000;
+          }
+        }
+
+  - name: Enable Nginx site
+    file:
+      src: /etc/nginx/sites-available/graylog
+      dest: /etc/nginx/sites-enabled/graylog
+      state: link
+
+  - name: Restart Nginx
+    systemd:
+      name: nginx
+      state: restarted
+
+  - name: Obtain Let's Encrypt certificate
+    command: certbot --nginx -d {{ graylog_domain }} --non-interactive --agree-tos -m {{ letsencrypt_email }}
+    args:
+      creates: /etc/letsencrypt/live/{{ graylog_domain }}
+
+  ########################################
+  # Firewall
+  ########################################
+
+  - name: Allow SSH
+    ufw:
+      rule: allow
+      name: OpenSSH
+
+  - name: Allow HTTP/HTTPS
+    ufw:
+      rule: allow
+      port: "{{ item }}"
+    loop:
+      - 80
+      - 443
+
+  - name: Enable UFW
+    ufw:
+      state: enabled
